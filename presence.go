@@ -5,6 +5,72 @@ import (
 	"strings"
 )
 
+// AnyFn iterates over elements of collection, returning true if one predicate returns truthy for.
+func AnyFn(arr interface{}, predicate interface{}) bool {
+	if !IsIteratee(arr) {
+		panic("First parameter must be an iteratee")
+	}
+
+	if !IsFunction(predicate, 1, 1) {
+		panic("Second argument must be function")
+	}
+
+	funcValue := reflect.ValueOf(predicate)
+
+	funcType := funcValue.Type()
+
+	if funcType.Out(0).Kind() != reflect.Bool {
+		panic("Return argument should be a boolean")
+	}
+
+	arrValue := reflect.ValueOf(arr)
+
+	for i := 0; i < arrValue.Len(); i++ {
+		elem := arrValue.Index(i)
+
+		result := funcValue.Call([]reflect.Value{elem})[0].Interface().(bool)
+
+		if result {
+			return true
+		}
+	}
+
+	return false
+}
+
+// AllFn iterates over elements of collection, returning true if all predicates return truthy for.
+func AllFn(arr interface{}, predicate interface{}) bool {
+	if !IsIteratee(arr) {
+		panic("First parameter must be an iteratee")
+	}
+
+	if !IsFunction(predicate, 1, 1) {
+		panic("Second argument must be function")
+	}
+
+	funcValue := reflect.ValueOf(predicate)
+
+	funcType := funcValue.Type()
+
+	if funcType.Out(0).Kind() != reflect.Bool {
+		panic("Return argument should be a boolean")
+	}
+
+	arrValue := reflect.ValueOf(arr)
+
+	for i := 0; i < arrValue.Len(); i++ {
+		elem := arrValue.Index(i)
+
+		result := funcValue.Call([]reflect.Value{elem})[0].Interface().(bool)
+
+		if !result {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Filter iterates over elements of collection, returning an array of
 // all elements predicate returns truthy for.
 func Filter(arr interface{}, predicate interface{}) interface{} {

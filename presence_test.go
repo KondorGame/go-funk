@@ -31,6 +31,38 @@ var c = &Foo{
 
 var results = []*Foo{f, c}
 
+func TestAnyFn(t *testing.T) {
+	is := assert.New(t)
+
+	is.True(AnyFn(results, func(x *Foo) bool {
+		return x.Age > 27
+	}))
+
+	is.False(AnyFn(results, func(x *Foo) bool {
+		return x.Age < 27
+	}))
+
+	is.True(AnyFn(results, func(x *Foo) bool {
+		return x.FirstName == "Harald"
+	}))
+}
+
+func TestAllFn(t *testing.T) {
+	is := assert.New(t)
+
+	is.True(AnyFn(results, func(x *Foo) bool {
+		return x.Age > 20
+	}))
+
+	is.False(AnyFn(results, func(x *Foo) bool {
+		return x.Age > 40
+	}))
+
+	is.False(AnyFn(results, func(x *Foo) bool {
+		return x.FirstName == "Florent"
+	}))
+}
+
 func TestContains(t *testing.T) {
 	is := assert.New(t)
 
